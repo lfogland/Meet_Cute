@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meet Cute</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 2rem;
+        background: #fdf6f0;
+      }
+      form {
+        margin-bottom: 2rem;
+      }
+      input {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        width: 300px;
+      }
+      button {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        background: #ff6584;
+        color: white;
+        border: none;
+        border-radius: 5px;
+      }
+      .story-card {
+        background: white;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .story-title {
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+      .movie {
+        color: #ff6584;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Meet Cute Story Submission</h1>
+
+    <form id="storyForm">
+      <input
+        type="text"
+        id="storyText"
+        placeholder="Story Text"
+        required
+      /><br />
+      <input type="text" id="city" placeholder="City (optional)" /><br />
+      <button type="submit">Submit Story</button>
+    </form>
+
+    <h2>Latest Story</h2>
+    <div id="latestStory"></div>
+
+    <h2>All Stories</h2>
+    <div id="allStories"></div>
+
+    <script>
+      const storyForm = document.getElementById("storyForm");
+      const latestStoryDiv = document.getElementById("latestStory");
+      const allStoriesDiv = document.getElementById("allStories");
+
+      storyForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const storyText = document.getElementById("storyText").value;
+        const city = document.getElementById("city").value;
+
+        // POST the story
+        const response = await fetch("/submit-story", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ story_text: storyText, city: city }),
+        });
+
+        const data = await response.json();
+        displayLatestStory(data);
+
+        // GET all stories
+        const allResponse = await fetch("/stories");
+        const allData = await allResponse.json();
+        displayAllStories(allData.stories);
+
+        // Clear the form
+        storyForm.reset();
+      });
+
+      function displayLatestStory(story) {
+        latestStoryDiv.innerHTML = `
+        <div class="story-card">
+          <div class="story-title">${story.story_title}</div>
+          <div><strong>Story:</strong> ${story.story_text}</div>
+          <div><strong>City:</strong> ${story.city || "N/A"}</div>
+          <div><strong>Movie:</strong> <span class="movie">${story.matched_movie.title} (${story.matched_movie.year})</span></div>
+          <div><strong>Score:</strong> ${story.match_score}</div>
+          <div><strong>Reason:</strong> ${story.match_reason}</div>
+        </div>
+      `;
+      }
+
+      function displayAllStories(stories) {
+        allStoriesDiv.innerHTML = stories
+          .map(
+            (story) => `
+          <div class="story-card">
+            <div class="story-title">${story.story_title}</div>
+            <div><strong>Story:</strong> ${story.story_text}</div>
+            <div><strong>City:</strong> ${story.city || "N/A"}</div>
+            <div><strong>Movie:</strong> <span class="movie">${story.matched_movie.title} (${story.matched_movie.year})</span></div>
+            <div><strong>Score:</strong> ${story.match_score}</div>
+          </div>
+        `,
+          )
+          .join("");
+      }
+
+      // Optional: load existing stories on page load
+      async function loadStories() {
+        const allResponse = await fetch("/stories");
+        const allData = await allResponse.json();
+        displayAllStories(allData.stories);
+      }
+      loadStories();
+    </script>
+  </body>
+</html>
