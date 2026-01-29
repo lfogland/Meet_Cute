@@ -1,0 +1,7 @@
+body { font-family: sans-serif; margin: 2rem; background: #fdf6f0; }
+form { margin-bottom: 2rem; }
+input { margin: 0.5rem 0; padding: 0.5rem; width: 300px; }
+button { padding: 0.5rem 1rem; cursor: pointer; background: #ff6584; color: white; border: none; border-radius: 5px; }
+.story-card { background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.story-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.movie { color: #ff6584; font-weight: bold; }
